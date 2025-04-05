@@ -1,5 +1,5 @@
-CREATE DATABASE provador_bd;
-USE provador_bd;
+CREATE DATABASE Provador;
+USE Provador;
 
 CREATE TABLE Empresa (
 	id_empresa INT AUTO_INCREMENT PRIMARY KEY,
@@ -13,8 +13,8 @@ CREATE TABLE Empresa (
 CREATE TABLE Sensor (
 	id_sensor INT AUTO_INCREMENT PRIMARY KEY,
     numero_serie INT NOT NULL UNIQUE,
-    data_fabricacao DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL UNIQUE,
-    status_sensor VARCHAR(40) DEFAULT "Inativo" NOT NULL UNIQUE,
+    data_fabricacao DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    status_sensor VARCHAR(40) DEFAULT "Inativo" NOT NULL,
     CONSTRAINT regra_ativacao CHECK(status_sensor IN ("Ativo", "Inativo"))
 );
 
@@ -26,25 +26,30 @@ CREATE TABLE Loja (
     cidade VARChAR(50),
     nome_unidade VARCHAR(50),
     CONSTRAINT regra_fk_empresa FOREIGN KEY(fk_empresa) REFERENCES Empresa(id_empresa),
-    CONSTRAINT regra_concat_loja PRIMARY KEY(id_loja, fk_empresa)
+    PRIMARY KEY(id_loja, fk_empresa)
 );
 
 CREATE TABLE Provador (
 	id_provador INT NOT NULL,
     fk_loja INT NOT NULL,
+    fk_empresa INT NOT NULL,
     fk_sensor INT NOT NULL UNIQUE,
-    CONSTRAINT regra_fk_sensor FOREIGN KEY(fk_sensor) REFERENCES Sensor(id_sensor),
-    CONSTRAINT regra_concat_provador PRIMARY KEY(id_provador, fk_loja),
-    CONSTRAINT regra_fk_loja FOREIGN KEY(fk_loja, fk_sensor) REFERENCES Loja(id_loja, fk_empresa)
+    CONSTRAINT fk_lojaProvador FOREIGN KEY(fk_loja) REFERENCES Loja(id_loja),
+    CONSTRAINT fk_empresaProvador FOREIGN KEY(fk_empresa) REFERENCES Empresa(id_empresa),
+    CONSTRAINT fk_sensorProvador FOREIGN KEY(fk_sensor) REFERENCES Sensor(id_sensor),
+    PRIMARY KEY(id_provador, fk_loja, fk_empresa)
     );
 
 CREATE TABLE Registro (
     fk_provador INT NOT NULL,
     fk_loja INT NOT NULL,
+    fk_empresa INT NOT NULL,
     data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,
     registro BOOLEAN,
-    PRIMARY KEY(fk_provador, fk_loja, data_hora),
-    CONSTRAINT regra_fk_registro FOREIGN KEY(fk_provador, fk_loja) REFERENCES Provador(id_provador, fk_loja)
+    PRIMARY KEY(fk_provador, fk_loja, fk_empresa, data_hora),
+    CONSTRAINT fk_provadorRegistro FOREIGN KEY(fk_provador) REFERENCES Provador(id_provador),
+    CONSTRAINT fk_lojaRegistro FOREIGN KEY(fk_loja) REFERENCES Loja(id_loja), 
+    CONSTRAINT fk_empresaRegistro FOREIGN KEY(fk_empresa) REFERENCES Empresa(id_empresa)
 );
 
 
