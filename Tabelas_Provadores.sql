@@ -42,11 +42,12 @@ idSensor int primary key auto_increment,
 status_sensor varchar(20) not null
 );
 
-create table registros (
-idRegistro int,
+create table registro (
+idRegistro int auto_increment,
 idSensor int,
 registro char(1) not null,
-data_hora datetime default current_timestamp
+entrada datetime,
+saida datetime default null
 );
 
 
@@ -56,7 +57,7 @@ desc enderecos;
 desc lojas;
 desc provadores;
 desc sensores;
-desc registros;
+desc registro;
 
 -- Declarando as FKs e PKs das tabelas
 /* 
@@ -94,8 +95,8 @@ alter table provadores add constraint pkCompostaProvador primary key (idProvador
 alter table provadores add constraint fkProvadorSensor foreign key (fkSensor) references sensores(idSensor);
 alter table provadores add constraint chkProvadorSessao check(sessao in('Masculino', 'Feminino', 'Unissex'));
 alter table sensores add constraint chkSensorStatus check(status_sensor in('Inativo', 'Ativo', 'Manutenção'));
-alter table registros add constraint fkRegistroSensor foreign key (idSensor) references sensores(idSensor);
-alter table registros add constraint pkCompostaRegistro primary key (idRegistro, idSensor);
+alter table registro add constraint fkRegistroSensor foreign key (idSensor) references sensores(idSensor);
+alter table registro add constraint pkCompostaRegistro primary key (idRegistro, idSensor);
 
 -- Inserindo dados
 insert into usuarios (nome_completo, email, telefone, senha) values
