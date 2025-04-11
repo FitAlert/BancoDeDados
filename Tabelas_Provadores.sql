@@ -42,12 +42,11 @@ idSensor int primary key auto_increment,
 status_sensor varchar(20) not null
 );
 
-create table registro (
-idRegistro int auto_increment,
-idSensor int,
+create table registros (
+idRegistro int primary key auto_increment,
+fkSensor int,
 registro char(1) not null,
-entrada datetime,
-saida datetime default null
+data_hora datetime default current_timestamp
 );
 
 
@@ -57,7 +56,7 @@ desc enderecos;
 desc lojas;
 desc provadores;
 desc sensores;
-desc registro;
+desc registros;
 
 -- Declarando as FKs e PKs das tabelas
 /* 
@@ -82,8 +81,8 @@ REGRAS DE NEGÓCIO
 - 1 Provador pode ter somente 1 Sensor
 - Sensor só pode ter o status Inativo, Ativo ou Manutenção.  
 
-- 1 Registro depende de 1 Sensor
-- 1 Sensor fornece somente 1 Registro. 
+- 1 Registro é de 1 Sensor
+- 1 Sensor fornece vários Registros.  
 */
 
 alter table usuarios add constraint chkUsuarioEmail check(email like '%@%');
@@ -95,8 +94,7 @@ alter table provadores add constraint pkCompostaProvador primary key (idProvador
 alter table provadores add constraint fkProvadorSensor foreign key (fkSensor) references sensores(idSensor);
 alter table provadores add constraint chkProvadorSessao check(sessao in('Masculino', 'Feminino', 'Unissex'));
 alter table sensores add constraint chkSensorStatus check(status_sensor in('Inativo', 'Ativo', 'Manutenção'));
-alter table registro add constraint fkRegistroSensor foreign key (idSensor) references sensores(idSensor);
-alter table registro add constraint pkCompostaRegistro primary key (idRegistro, idSensor);
+alter table registros add constraint fkRegistroSensor foreign key (idSensor) references sensores(idSensor);
 
 -- Inserindo dados
 insert into usuarios (nome_completo, email, telefone, senha) values
@@ -184,3 +182,14 @@ from provadores as p
 		join sensores as s
         on p.fkSensor = s.idSensor
 where s.idSensor = 3;
+
+-- Exibir os dados do Registro e de qual Sensor está vindo
+select 
+	r.idRegistro as 'Nº Registro',
+    s.idSensor as 'Nº Sensor',
+    r.registro as Registro,
+    r.data_hora as Data
+from registros as r
+	join sensores as s
+    on r.fkSensor = s.idSensor;
+    
