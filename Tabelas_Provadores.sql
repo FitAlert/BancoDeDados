@@ -46,7 +46,8 @@ create table registros (
 idRegistro int primary key auto_increment,
 fkSensor int,
 registro char(1) not null,
-data_hora datetime default current_timestamp
+data_entrada datetime default current_timestamp,
+data_saida datetime
 );
 
 
