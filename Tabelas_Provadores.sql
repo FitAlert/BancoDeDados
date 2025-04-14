@@ -95,7 +95,7 @@ alter table provadores add constraint pkCompostaProvador primary key (idProvador
 alter table provadores add constraint fkProvadorSensor foreign key (fkSensor) references sensores(idSensor);
 alter table provadores add constraint chkProvadorSessao check(sessao in('Masculino', 'Feminino', 'Unissex'));
 alter table sensores add constraint chkSensorStatus check(status_sensor in('Inativo', 'Ativo', 'Manutenção'));
-alter table registros add constraint fkRegistroSensor foreign key (idSensor) references sensores(idSensor);
+alter table registros add constraint fkRegistroSensor foreign key (fkSensor) references sensores(idSensor);
 
 -- Inserindo dados
 insert into usuarios (nome_completo, email, telefone, senha) values
@@ -189,8 +189,8 @@ select
 	r.idRegistro as 'Nº Registro',
     s.idSensor as 'Nº Sensor',
     r.registro as Registro,
-    r.data_hora as Data
+    r.data_entrada as Entrada,
+    r.data_saida as Saída
 from registros as r
 	join sensores as s
     on r.fkSensor = s.idSensor;
-    
