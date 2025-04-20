@@ -42,13 +42,13 @@ CONSTRAINT chkSensorStatus CHECK(status_sensor in('Inativo', 'Ativo', 'Manutenç
 
 
 CREATE TABLE provadores (
-idProvador int,
-idLoja int,
-sessao varchar(45) not null,
-fkSensor int unique,
+idProvador INT,
+idLoja INT,
+sessao VARCHAR(45) NOT NULL,
+fkSensor INT UNIQUE,
+PRIMARY KEY (idProvador, idLoja),
 CONSTRAINT chkProvadorSessao CHECK(sessao in('Masculino', 'Feminino', 'Unissex')),
 CONSTRAINT fkProvadorLoja FOREIGN KEY (idLoja) REFERENCES lojas(idLoja),
-PRIMARY KEY (idProvador, idLoja),
 CONSTRAINT fkProvadorSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor)
 );
 
