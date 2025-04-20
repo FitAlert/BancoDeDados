@@ -1,35 +1,35 @@
-create database provador;
-use provador;
+CREATE DATABASE provador;
+USE provador;
 
 -- Criação das tabelas conforme o DER (Diagrama Entidade Relacionamento)
 
-create table usuarios (
-idUsuario int primary key auto_increment,
-nome_completo varchar(45) not null,
-email varchar(45) not null,
-telefone char(11),
-senha varchar(50) not null
+CREATE TABLE usuarios (
+idUsuario INT PRIMARY KEY AUTO_INCREMENT,
+nome_completo  VARCHAR(45) NOT NULL,
+email VARCHAR(45) NOT NULL,
+telefone CHAR(11),
+senha VARCHAR(50) NOT NULL
 );
 
-create table lojas (
-idLoja int primary key auto_increment,
-nome varchar(45) not null,
-fkUsuario int,
-cnpj char(18) not null,
-fkLojaMatriz int,
-fkEndereco int unique
+CREATE TABLE lojas (
+idLoja INT PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(45) NOT NULL,
+fkUsuario INT,
+cnpj CHAR(18) NOT NULL,
+fkLojaMatriz INT,
+fkEndereco INT UNIQUE
 );
 
-create table enderecos (
-idEndereco int primary key auto_increment,
-uf char(2) not null,
-cidade varchar(45) not null,
-rua varchar(45) not null,
-numero varchar(5) not null,
-cep char(9) not null
+create TABLE enderecos (
+idEndereco INT PRIMARY KEY AUTO_INCREMENT,
+uf CHAR(2) NOT NULL,
+cidade VARCHAR(45) NOT NULL,
+rua VARCHAR(45) NOT NULL,
+numero VARCHAR(5) NOT NULL,
+cep CHAR(9) NOT NULL
 );
 
-create table provadores (
+CREATE TABLE provadores (
 idProvador int,
 idLoja int,
 sessao varchar(45) not null,
@@ -37,29 +37,29 @@ fkSensor int unique
 );
 
 
-create table sensores (
-idSensor int primary key auto_increment,
-status_sensor varchar(20) not null
+CREATE TABLE sensores (
+idSensor INT PRIMARY KEY AUTO_INCREMENT,
+status_sensor VARCHAR(20) NOT NULL
 );
 
-create table registros (
-idRegistro int primary key auto_increment,
-fkSensor int,
-registro char(1) not null,
-data_entrada datetime default current_timestamp,
-data_saida datetime
+CREATE TABLE registros (
+idRegistro INT PRIMARY KEY AUTO_INCREMENT,
+fkSensor INT,
+registro CHAR(1) NOT NULL,
+data_entrada DATETIME DEFAULT CURRENT_TIMESTAMP,
+data_saida DATETIME
 );
 
 
-show tables;
-desc usuarios;
-desc enderecos;
-desc lojas;
-desc provadores;
-desc sensores;
-desc registros;
+SHOW TABLES;
+DESC usuarios;
+DESC enderecos;
+DESC lojas;
+DESC provadores;
+DESC sensores;
+DESC registros;
 
--- Declarando as FKs e PKs das tabelas
+-- Declarando AS FKs e PKs das tabelas
 /* 
 REGRAS DE NEGÓCIO 
 - Email deve conter @. 
@@ -86,111 +86,112 @@ REGRAS DE NEGÓCIO
 - 1 Sensor fornece vários Registros.  
 */
 
-alter table usuarios add constraint chkUsuarioEmail check(email like '%@%');
-alter table lojas add constraint fkLojaUsuario foreign key (fkUsuario) references usuarios(idUsuario);
-alter table lojas add constraint fkLojaEndereco foreign key (fkEndereco) references enderecos(idEndereco);
-alter table lojas add constraint fkLojaMatriz foreign key (fkLojaMatriz) references lojas(idLoja);
-alter table provadores add constraint fkProvadorLoja foreign key (idLoja) references lojas(idLoja);
-alter table provadores add constraint pkCompostaProvador primary key (idProvador, idLoja);
-alter table provadores add constraint fkProvadorSensor foreign key (fkSensor) references sensores(idSensor);
-alter table provadores add constraint chkProvadorSessao check(sessao in('Masculino', 'Feminino', 'Unissex'));
-alter table sensores add constraint chkSensorStatus check(status_sensor in('Inativo', 'Ativo', 'Manutenção'));
-alter table registros add constraint fkRegistroSensor foreign key (fkSensor) references sensores(idSensor);
+ALTER TABLE usuarios ADD CONSTRAINT chkUsuarioEmail CHECK(email like '%@%');
+ALTER TABLE lojas ADD CONSTRAINT fkLojaUsuario FOREIGN KEY (fkUsuario) REFERENCES usuarios(idUsuario);
+ALTER TABLE lojas ADD CONSTRAINT fkLojaEndereco FOREIGN KEY (fkEndereco) REFERENCES enderecos(idEndereco);
+ALTER TABLE lojas ADD CONSTRAINT fkLojaMatriz FOREIGN KEY (fkLojaMatriz) REFERENCES lojas(idLoja);
+ALTER TABLE provadores ADD CONSTRAINT fkProvadorLoja FOREIGN KEY (idLoja) REFERENCES lojas(idLoja);
+ALTER TABLE provadores ADD CONSTRAINT pkCompostaProvador primary KEY (idProvador, idLoja);
+ALTER TABLE provadores ADD CONSTRAINT fkProvadorSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor);
+ALTER TABLE provadores ADD CONSTRAINT chkProvadorSessao CHECK(sessao in('Masculino', 'Feminino', 'Unissex'));
+ALTER TABLE sensores ADD CONSTRAINT chkSensorStatus CHECK(status_sensor in('Inativo', 'Ativo', 'Manutenção'));
+ALTER TABLE registros ADD CONSTRAINT fkRegistroSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor);
 
 -- Inserindo dados
-insert into usuarios (nome_completo, email, telefone, senha) values
+INSERT INTO usuarios (nome_completo, email, telefone, senha) VALUES
 	('Marcos Vinicius Silva de Oliveira', 'marcos.vinicius.oliveira@gmail.com', '11936728894', 'senhaSegura123');
-select * from usuarios;
+SELECT * FROM usuarios;
 
-insert into enderecos (uf, cidade, rua, numero, cep) values
+INSERT INTO enderecos (uf, cidade, rua, numero, cep) VALUES
 	('SP', 'Santo André', 'Rua dos Lagos', '237', '03711-008');
-select * from enderecos;
+SELECT * FROM enderecos;
 
-insert into lojas (nome, fkUsuario, cnpj, fkLojaMatriz, fkEndereco) values
+INSERT INTO lojas (nome, fkUsuario, cnpj, fkLojaMatriz, fkEndereco) VALUES
 	('Vida Moda Central', 1, '43.937.819/0237-22', 1, 1);
-select * from lojas;
+SELECT * FROM lojas;
 
-insert into sensores (status_sensor) values
+INSERT INTO sensores (status_sensor) VALUES
 	('Ativo'),
     ('Inativo'),
     ('Manutenção');
-select * from sensores;
+SELECT * FROM sensores;
 
-insert into provadores (idProvador, idLoja, sessao, fkSensor) values
+INSERT INTO provadores (idProvador, idLoja, sessao, fkSensor) VALUES
 	(1, 1, 'Masculino', 1),
 	(2, 1, 'Feminino', 2),
 	(3, 1, 'Unissex', 3);
-select * from provadores;
+SELECT * FROM provadores;
 
 -- Exibindo dados do usuario, loja vinculada, loja matriz e endereço
-select 
-	u.nome_completo as Usuário,
-    u.email as Email,
-    u.telefone as Telefone,
-    l.nome as Loja,
-    l.cnpj as CNPJ, 
-    le.nome as 'Loja Matriz',
-    e.uf as UF,
-    e.cidade as Cidade,
-    e.rua as Rua,
-    e.numero as Número,
-    e.cep as CEP
-from usuarios as u 
-	join lojas as l
-	on u.idUsuario = l.fkUsuario
-		join lojas as le
-		on le.idLoja = l.fkLojaMatriz
-				join enderecos as e
-                on e.idEndereco = l.fkEndereco;
+SELECT 
+	u.nome_completo AS Usuário,
+    u.email AS Email,
+    u.telefone AS Telefone,
+    l.nome AS Loja,
+    l.cnpj AS CNPJ, 
+    le.nome AS 'Loja Matriz',
+    e.uf AS UF,
+    e.cidade AS Cidade,
+    e.rua AS Rua,
+    e.numero AS Número,
+    e.cep AS CEP
+FROM usuarios AS u 
+	JOIN lojas AS l
+	ON u.idUsuario = l.fkUsuario
+		JOIN lojas AS le
+		ON le.idLoja = l.fkLojaMatriz
+				JOIN enderecos AS e
+                ON e.idEndereco = l.fkEndereco;
                 
 -- Exibir os dados dos provadores, qual loja estão, e qual sensor instalado
-select
-	p.idProvador as Provador,
-    l.nome as Loja,
-    p.sessao as Sessão,
-    s.idSensor as Sensor,
-    s.status_sensor as Status
-from provadores as p
-	join lojas as l
-    on p.idLoja = l.idLoja
-		join sensores as s
-        on p.fkSensor = s.idSensor;
+SELECT
+	p.idProvador AS Provador,
+    l.nome AS Loja,
+    p.sessao AS Sessão,
+    s.idSensor AS Sensor,
+    s.status_sensor AS Status
+FROM provadores AS p
+	JOIN lojas AS l
+    ON p.idLoja = l.idLoja
+		JOIN sensores AS s
+        ON p.fkSensor = s.idSensor;
         
 -- Localizar o sensores em manutenção ou inativos 
-select
-	p.idProvador as Provador,
-    l.nome as Loja,
-    p.sessao as Sessão,
-    s.idSensor as Sensor,
-    s.status_sensor as Status
-from provadores as p
-	join lojas as l
-    on p.idLoja = l.idLoja
-		join sensores as s
-        on p.fkSensor = s.idSensor
-where s.status_sensor = 'Inativo' or s.status_sensor = 'Manutenção';
+SELECT
+	p.idProvador AS Provador,
+    l.nome AS Loja,
+    p.sessao AS Sessão,
+    s.idSensor AS Sensor,
+    s.status_sensor AS Status
+FROM provadores AS p
+	JOIN lojas AS l
+    ON p.idLoja = l.idLoja
+		JOIN sensores AS s
+        ON p.fkSensor = s.idSensor
+where s.status_sensor = 'Inativo' OR s.status_sensor = 'Manutenção';
 
 -- Localizar o sensor 3
-select 
-	p.idProvador as Provador,
-    l.nome as Loja,
-    p.sessao as Sessão,
-    s.idSensor as Sensor,
-    s.status_sensor as Status
-from provadores as p
-	join lojas as l
-    on p.idLoja = l.idLoja
-		join sensores as s
-        on p.fkSensor = s.idSensor
+SELECT 
+	p.idProvador AS Provador,
+    l.nome AS Loja,
+    p.sessao AS Sessão,
+    s.idSensor AS Sensor,
+    s.status_sensor AS Status
+FROM provadores AS p
+	JOIN lojas AS l
+    ON p.idLoja = l.idLoja
+		JOIN sensores AS s
+        ON p.fkSensor = s.idSensor
 where s.idSensor = 3;
 
 -- Exibir os dados do Registro e de qual Sensor está vindo
-select 
-	r.idRegistro as 'Nº Registro',
-    s.idSensor as 'Nº Sensor',
-    r.registro as Registro,
-    r.data_entrada as Entrada,
-    r.data_saida as Saída
-from registros as r
-	join sensores as s
-    on r.fkSensor = s.idSensor;
+SELECT 
+	r.idRegistro AS 'Nº Registro',
+    s.idSensor AS 'Nº Sensor',
+    r.registro AS Registro,
+    r.data_entrada AS Entrada,
+    r.data_saida AS Saída
+FROM registros AS r
+	JOIN sensores AS s
+    ON r.fkSensor = s.idSensor;
+    
