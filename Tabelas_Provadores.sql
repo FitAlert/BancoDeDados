@@ -9,16 +9,7 @@ nome_completo  VARCHAR(45) NOT NULL,
 email VARCHAR(45) NOT NULL,
 telefone CHAR(11),
 senha VARCHAR(50) NOT NULL,
-CONSTRAINT chkUsuarioEmail CHECK(email like '%@%');
-);
-
-CREATE TABLE lojas (
-idLoja INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(45) NOT NULL,
-fkUsuario INT,
-cnpj CHAR(18) NOT NULL,
-fkLojaMatriz INT,
-fkEndereco INT UNIQUE
+CONSTRAINT chkUsuarioEmail CHECK(email like '%@%')
 );
 
 create TABLE enderecos (
@@ -30,27 +21,45 @@ numero VARCHAR(5) NOT NULL,
 cep CHAR(9) NOT NULL
 );
 
+
+CREATE TABLE lojas (
+idLoja INT PRIMARY KEY AUTO_INCREMENT,
+nome VARCHAR(45) NOT NULL,
+fkUsuario INT,
+cnpj CHAR(18) NOT NULL,
+fkLojaMatriz INT,
+fkEndereco INT UNIQUE,
+CONSTRAINT fkLojaUsuario FOREIGN KEY (fkUsuario) REFERENCES usuarios(idUsuario),
+CONSTRAINT fkLojaMatriz FOREIGN KEY (fkLojaMatriz) REFERENCES lojas(idLoja),
+CONSTRAINT fkLojaEndereco FOREIGN KEY (fkEndereco) REFERENCES enderecos(idEndereco)
+);
+
+CREATE TABLE sensores (
+idSensor INT PRIMARY KEY AUTO_INCREMENT,
+status_sensor VARCHAR(20) NOT NULL,
+CONSTRAINT chkSensorStatus CHECK(status_sensor in('Inativo', 'Ativo', 'Manutenção'))
+);
+
+
 CREATE TABLE provadores (
 idProvador int,
 idLoja int,
 sessao varchar(45) not null,
 fkSensor int unique,
-CONSTRAINT chkProvadorSessao CHECK(sessao in('Masculino', 'Feminino', 'Unissex'))
+CONSTRAINT chkProvadorSessao CHECK(sessao in('Masculino', 'Feminino', 'Unissex')),
+CONSTRAINT fkProvadorLoja FOREIGN KEY (idLoja) REFERENCES lojas(idLoja),
+PRIMARY KEY (idProvador, idLoja),
+CONSTRAINT fkProvadorSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor)
 );
 
-
-CREATE TABLE sensores (
-idSensor INT PRIMARY KEY AUTO_INCREMENT,
-status_sensor VARCHAR(20) NOT NULL,
-CONSTRAINT chkSensorStatus CHECK(status_sensor in('Inativo', 'Ativo', 'Manutenção'));
-);
 
 CREATE TABLE registros (
 idRegistro INT PRIMARY KEY AUTO_INCREMENT,
 fkSensor INT,
 registro CHAR(1) NOT NULL,
 data_entrada DATETIME DEFAULT CURRENT_TIMESTAMP,
-data_saida DATETIME
+data_saida DATETIME,
+CONSTRAINT fkRegistroSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor)
 );
 
 
@@ -88,13 +97,8 @@ REGRAS DE NEGÓCIO
 - 1 Registro é de 1 Sensor
 - 1 Sensor fornece vários Registros.  
 */
-ALTER TABLE lojas ADD CONSTRAINT fkLojaUsuario FOREIGN KEY (fkUsuario) REFERENCES usuarios(idUsuario);
-ALTER TABLE lojas ADD CONSTRAINT fkLojaEndereco FOREIGN KEY (fkEndereco) REFERENCES enderecos(idEndereco);
-ALTER TABLE lojas ADD CONSTRAINT fkLojaMatriz FOREIGN KEY (fkLojaMatriz) REFERENCES lojas(idLoja);
-ALTER TABLE provadores ADD CONSTRAINT fkProvadorLoja FOREIGN KEY (idLoja) REFERENCES lojas(idLoja);
-ALTER TABLE provadores ADD CONSTRAINT pkCompostaProvador PRIMARY KEY (idProvador, idLoja);
-ALTER TABLE provadores ADD CONSTRAINT fkProvadorSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor);
-ALTER TABLE registros ADD CONSTRAINT fkRegistroSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor);
+
+
 
 -- Inserindo dados
 INSERT INTO usuarios (nome_completo, email, telefone, senha) VALUES
