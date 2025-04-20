@@ -2,6 +2,9 @@
 
 Este projeto consiste em um sistema de monitoramento de provadores de lojas, com um banco de dados que armazena informações sobre usuários, lojas, sensores e provadores. O sistema foi projetado para monitorar a utilização dos provadores nas lojas, controlando o status dos sensores e registrando as entradas e saídas dos sensores.
 
+## Modelagem 
+![Diagrama ER](imgs/merder.png)
+
 ## Tabelas do Banco de Dados
 
 O banco de dados `provador` contém as seguintes tabelas:
