@@ -6,10 +6,12 @@ USE provador;
 CREATE TABLE usuarios (
 idUsuario INT PRIMARY KEY AUTO_INCREMENT,
 nome_completo  VARCHAR(45) NOT NULL,
+fkLoja INT,
 email VARCHAR(45) NOT NULL,
 telefone CHAR(11),
 senha VARCHAR(50) NOT NULL,
 CONSTRAINT chkUsuarioEmail CHECK(email like '%@%')
+-- foreign key (fkLoja) references lojas(idLoja) linha 62
 );
 
 create TABLE enderecos (
@@ -21,15 +23,12 @@ numero VARCHAR(5) NOT NULL,
 cep CHAR(9) NOT NULL
 );
 
-
 CREATE TABLE lojas (
 idLoja INT PRIMARY KEY AUTO_INCREMENT,
 nome VARCHAR(45) NOT NULL,
-fkUsuario INT,
 cnpj CHAR(18) NOT NULL,
 fkLojaMatriz INT,
 fkEndereco INT UNIQUE,
-CONSTRAINT fkLojaUsuario FOREIGN KEY (fkUsuario) REFERENCES usuarios(idUsuario),
 CONSTRAINT fkLojaMatriz FOREIGN KEY (fkLojaMatriz) REFERENCES lojas(idLoja),
 CONSTRAINT fkLojaEndereco FOREIGN KEY (fkEndereco) REFERENCES enderecos(idEndereco)
 );
@@ -39,7 +38,6 @@ idSensor INT PRIMARY KEY AUTO_INCREMENT,
 status_sensor VARCHAR(20) NOT NULL,
 CONSTRAINT chkSensorStatus CHECK(status_sensor in('Inativo', 'Ativo', 'Manutenção'))
 );
-
 
 CREATE TABLE provadores (
 idProvador INT,
@@ -52,7 +50,6 @@ CONSTRAINT fkProvadorLoja FOREIGN KEY (idLoja) REFERENCES lojas(idLoja),
 CONSTRAINT fkProvadorSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor)
 );
 
-
 CREATE TABLE registros (
 idRegistro INT PRIMARY KEY AUTO_INCREMENT,
 fkSensor INT,
@@ -62,6 +59,7 @@ data_saida DATETIME,
 CONSTRAINT fkRegistroSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor)
 );
 
+ALTER TABLE usuarios ADD CONSTRAINT chkUsuarioLoja FOREIGN KEY (fkLoja) REFERENCES lojas(idLoja);
 
 SHOW TABLES;
 DESC usuarios;
@@ -76,8 +74,8 @@ DESC registros;
 REGRAS DE NEGÓCIO 
 - Email deve conter @. 
 
-- 1 Usuário pode cadastrar várias Lojas
-- 1 Loja pertence somente a 1 Usuário.
+- 1 Usuário só pode ter 1 loja
+- 1 Loja pode er monitorada por vários usuários.
   
 - 1 Loja tem somente 1 Endereço
 - 1 Endereço é de somente 1 Loja. 
@@ -109,9 +107,11 @@ INSERT INTO enderecos (uf, cidade, rua, numero, cep) VALUES
 	('SP', 'Santo André', 'Rua dos Lagos', '237', '03711-008');
 SELECT * FROM enderecos;
 
-INSERT INTO lojas (nome, fkUsuario, cnpj, fkLojaMatriz, fkEndereco) VALUES
-	('Vida Moda Central', 1, '43.937.819/0237-22', 1, 1);
+INSERT INTO lojas (nome, cnpj, fkLojaMatriz, fkEndereco) VALUES
+	('Vida Moda Central', '43.937.819/0237-22', 1, 1);
 SELECT * FROM lojas;
+
+UPDATE usuarios SET fkLoja = 1 WHERE idUsuario = 1;
 
 INSERT INTO sensores (status_sensor) VALUES
 	('Ativo'),
@@ -140,7 +140,7 @@ SELECT
     e.cep AS CEP
 FROM usuarios AS u 
 	JOIN lojas AS l
-	ON u.idUsuario = l.fkUsuario
+	ON u.fkLoja = l.idLoja
 		JOIN lojas AS le
 		ON le.idLoja = l.fkLojaMatriz
 				JOIN enderecos AS e
