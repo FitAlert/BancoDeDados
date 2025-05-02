@@ -1,18 +1,7 @@
-CREATE DATABASE provador;
-USE provador;
+CREATE DATABASE fitAlert;
+USE fitAlert;
 
 -- Criação das tabelas conforme o DER (Diagrama Entidade Relacionamento)
-
-CREATE TABLE usuarios (
-idUsuario INT PRIMARY KEY AUTO_INCREMENT,
-nome_completo  VARCHAR(45) NOT NULL,
-fkLoja INT,
-email VARCHAR(45) NOT NULL,
-telefone CHAR(11),
-senha VARCHAR(50) NOT NULL,
-CONSTRAINT chkUsuarioEmail CHECK(email like '%@%')
--- foreign key (fkLoja) references lojas(idLoja) linha 62
-);
 
 create TABLE enderecos (
 idEndereco INT PRIMARY KEY AUTO_INCREMENT,
@@ -20,17 +9,30 @@ uf CHAR(2) NOT NULL,
 cidade VARCHAR(45) NOT NULL,
 rua VARCHAR(45) NOT NULL,
 numero VARCHAR(5) NOT NULL,
-cep CHAR(9) NOT NULL
+cep CHAR(8) NOT NULL
 );
 
 CREATE TABLE lojas (
 idLoja INT PRIMARY KEY AUTO_INCREMENT,
-nome VARCHAR(45) NOT NULL,
+nomeFantasia VARCHAR(45) NOT NULL,
+razaoSocial VARCHAR(45),
 cnpj CHAR(18) NOT NULL,
 fkLojaMatriz INT,
 fkEndereco INT UNIQUE,
+codigoAtivacao VARCHAR(50),
 CONSTRAINT fkLojaMatriz FOREIGN KEY (fkLojaMatriz) REFERENCES lojas(idLoja),
 CONSTRAINT fkLojaEndereco FOREIGN KEY (fkEndereco) REFERENCES enderecos(idEndereco)
+);
+
+CREATE TABLE usuarios (
+idUsuario INT PRIMARY KEY AUTO_INCREMENT,
+nomeUsuario  VARCHAR(45) NOT NULL,
+fkLoja INT,
+email VARCHAR(45) NOT NULL,
+telefone CHAR(11),
+senha VARCHAR(50) NOT NULL,
+CONSTRAINT chkUsuarioEmail CHECK(email like '%@%'),
+FOREIGN KEY (fkLoja) references lojas(idLoja)
 );
 
 CREATE TABLE sensores (
@@ -59,6 +61,14 @@ data_saida DATETIME,
 CONSTRAINT fkRegistroSensor FOREIGN KEY (fkSensor) REFERENCES sensores(idSensor)
 );
 
+CREATE TABLE aviso (
+	idAviso INT PRIMARY KEY AUTO_INCREMENT,
+	titulo VARCHAR(100),
+	descricao VARCHAR(150),
+	fkUsuario INT,
+	FOREIGN KEY (fkUsuario) REFERENCES usuarios(idUsuario)
+);
+
 ALTER TABLE usuarios ADD CONSTRAINT chkUsuarioLoja FOREIGN KEY (fkLoja) REFERENCES lojas(idLoja);
 
 SHOW TABLES;
@@ -69,7 +79,7 @@ DESC provadores;
 DESC sensores;
 DESC registros;
 
--- Declarando AS FKs e PKs das tabelas
+
 /* 
 REGRAS DE NEGÓCIO 
 - Email deve conter @. 
@@ -96,7 +106,7 @@ REGRAS DE NEGÓCIO
 - 1 Sensor fornece vários Registros.  
 */
 
-
+select * from usuarios;
 
 -- Inserindo dados
 INSERT INTO usuarios (nome_completo, email, telefone, senha) VALUES
@@ -104,11 +114,11 @@ INSERT INTO usuarios (nome_completo, email, telefone, senha) VALUES
 SELECT * FROM usuarios;
 
 INSERT INTO enderecos (uf, cidade, rua, numero, cep) VALUES
-	('SP', 'Santo André', 'Rua dos Lagos', '237', '03711-008');
+	('SP', 'Santo André', 'Rua dos Lagos', '237', '03711008');
 SELECT * FROM enderecos;
 
-INSERT INTO lojas (nome, cnpj, fkLojaMatriz, fkEndereco) VALUES
-	('Vida Moda Central', '43.937.819/0237-22', 1, 1);
+INSERT INTO lojas (nomeFantasia, razaoSocial, cnpj, fkLojaMatriz, fkEndereco, codigoAtivacao) VALUES
+	('Vida Moda Central', 'Moda', '43.937.819/0237-22', null, 1, 'ED145B');
 SELECT * FROM lojas;
 
 UPDATE usuarios SET fkLoja = 1 WHERE idUsuario = 1;
@@ -197,4 +207,3 @@ SELECT
 FROM registros AS r
 	JOIN sensores AS s
     ON r.fkSensor = s.idSensor;
-    
