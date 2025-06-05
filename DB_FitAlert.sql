@@ -72,13 +72,26 @@ CREATE TABLE TB_Avisos (
 ALTER TABLE TB_Usuarios ADD CONSTRAINT chkUsuarioEmpresa FOREIGN KEY (fkEmpresa) REFERENCES TB_Empresas(idEmpresa);
 
 insert into TB_Sensores values (default, 'Ativo');
--- SHOW TABLES;
--- DESC TB_Usuarios;
--- DESC TB_Enderecos;
--- DESC TB_Empresas;
--- DESC TB_Provadores;
--- DESC TB_Sensores;
--- DESC TB_Registros;
+
+ SHOW TABLES;
+ DESC TB_Usuarios;
+ DESC TB_Enderecos;
+ DESC TB_Empresas;
+ DESC TB_Provadores;
+ DESC TB_Sensores;
+ DESC TB_Registros;
+ 
+CREATE VIEW VW_Dashboard AS
+SELECT
+	r.fkSensor, r.ativo, r.data_entrada, r.data_saida,
+    s.status_sensor,
+    p.idProvador, p.idEmpresa, p.secao
+FROM TB_Registros r JOIN TB_Sensores s 
+ON r.fkSensor = s.idSensor
+JOIN TB_Provadores p 
+ON p.fkSensor = s.idSensor;
+
+DESC VW_Dashboard;
 
 
 /* 
