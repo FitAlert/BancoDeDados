@@ -91,6 +91,10 @@ DESC TB_Registros;
 DESC TB_Avisos;
 DESC VW_Dashboard;
 
+insert into TB_Sensores Values 
+(default, 'Ativo'),
+(default, 'Ativo');
+
 /*
 REGRAS DE NEGÓCIO 
 - Email deve conter @. 
